@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bot Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    
+    body {
+      background: #0f0f1a;
+      color: #eaeaea;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 800px;
+    }
+    
+    h1 {
+      color: #e94560;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-size: 2rem;
+    }
+    
+    /* Token Input */
+    .token-box {
+      background: #1a1a2e;
+      border: 1px solid #2a2a3e;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .token-box label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #a0a0b0;
+      font-size: 0.9rem;
+    }
+    
+    .token-input {
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 8px;
+      border: 2px solid #2a2a3e;
+      background: #0f0f1a;
+      color: #eaeaea;
+      font-size: 0.9rem;
+      font-family: monospace;
+    }
+    
+    .token-input:focus {
+      outline: none;
+      border-color: #e94560;
+    }
+    
+    /* Buttons */
+    .buttons {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .btn {
+      flex: 1;
+      padding: 1rem;
+      border-radius: 10px;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-start {
+      background: #00d26a;
+      color: #0f0f1a;
+    }
+    
+    .btn-start:hover {
+      background: #00b85c;
+      transform: translateY(-2px);
+    }
+    
+    .btn-stop {
+      background: #e94560;
+      color: white;
+    }
+    
+    .btn-stop:hover {
+      background: #c73e54;
+      transform: translateY(-2px);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    /* Status */
+    .status-box {
+      background: #1a1a2e;
+      border: 1px solid #2a2a3e;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .status-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #666;
+    }
+    
+    .status-dot.online {
+      background: #00d26a;
+      box-shadow: 0 0 10px #00d26a;
+    }
+    
+    .status-dot.offline {
+      background: #666;
+    }
+    
+    .status-text {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+    
+    .stats {
+      margin-right: auto;
+      display: flex;
+      gap: 1.5rem;
+      color: #a0a0b0;
+      font-size: 0.9rem;
+    }
+    
+    /* Logs */
+    .logs-box {
+      background: #1a1a2e;
+      border: 1px solid #2a2a3e;
+      border-radius: 12px;
+      padding: 1.5rem;
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .logs-box h3 {
+      margin-bottom: 1rem;
+      color: #e94560;
+    }
+    
+    .logs {
+      flex: 1;
+      overflow-y: auto;
+      background: #0f0f1a;
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+    
+    .logs:empty::before {
+      content: 'ما في لوق...';
+      color: #666;
+    }
+    
+    .log-line {
+      border-bottom: 1px solid #1a1a2e;
+      padding: 2px 0;
+    }
+    
+    /* Scrollbar */
+    .logs::-webkit-scrollbar { width: 6px; }
+    .logs::-webkit-scrollbar-track { background: #0f0f1a; }
+    .logs::-webkit-scrollbar-thumb { background: #2a2a3e; border-radius: 3px; }
+    
+    /* Alert */
+    .alert {
+      position: fixed;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 1rem 2rem;
+      border-radius: 10px;
+      font-weight: bold;
+      display: none;
+      z-index: 100;
+    }
+    
+    .alert-success { background: #00d26a; color: #0f0f1a; }
+    .alert-error { background: #e94560; color: white; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🤖 Bot Dashboard</h1>
+    
+    <!-- Token -->
+    <div class="token-box">
+      <label>🔑 توكن البوت:</label>
+      <input type="password" class="token-input" id="tokenInput" placeholder="حط التوكن هنا...">
+    </div>
+    
+    <!-- Buttons -->
+    <div class="buttons">
+      <button class="btn btn-start" id="startBtn" onclick="startBot()">▶️ تشغيل</button>
+      <button class="btn btn-stop" id="stopBtn" onclick="stopBot()" disabled>⏹️ إيقاف</button>
+    </div>
+    
+    <!-- Status -->
+    <div class="status-box">
+      <div class="status-dot offline" id="statusDot"></div>
+      <div class="status-text" id="statusText">البوت متوقف</div>
+      <div class="stats" id="stats"></div>
+    </div>
+    
+    <!-- Logs -->
+    <div class="logs-box">
+      <h3>📋 اللوق</h3>
+      <div class="logs" id="logs"></div>
+    </div>
+  </div>
+  
+  <!-- Alert -->
+  <div class="alert" id="alert"></div>
+
+  <script>
+    const logsDiv = document.getElementById('logs');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const statsDiv = document.getElementById('stats');
+    const alertBox = document.getElementById('alert');
+    
+    // WebSocket for real-time logs
+    const ws = new WebSocket(`ws://${location.host}`);
+    
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      
+      if (data.type === 'log') {
+        addLogLine(data.message);
+      }
+      
+      if (data.type === 'status') {
+        updateStatus(data.status);
+      }
+    };
+    
+    function addLogLine(msg) {
+      const div = document.createElement('div');
+      div.className = 'log-line';
+      div.textContent = msg;
+      logsDiv.appendChild(div);
+      logsDiv.scrollTop = logsDiv.scrollHeight;
+    }
+    
+    function updateStatus(status) {
+      if (status === 'online') {
+        statusDot.className = 'status-dot online';
+        statusText.textContent = 'البوت شغال ✅';
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+        loadStats();
+      } else {
+        statusDot.className = 'status-dot offline';
+        statusText.textContent = 'البوت متوقف';
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        statsDiv.innerHTML = '';
+      }
+    }
+    
+    function showAlert(msg, type) {
+      alertBox.textContent = msg;
+      alertBox.className = 'alert alert-' + type;
+      alertBox.style.display = 'block';
+      setTimeout(() => alertBox.style.display = 'none', 3000);
+    }
+    
+    async function startBot() {
+      const token = document.getElementById('tokenInput').value.trim();
+      
+      if (!token) {
+        showAlert('حط التوكن أول!', 'error');
+        return;
+      }
+      
+      startBtn.disabled = true;
+      startBtn.textContent = '⏳ جاري التشغيل...';
+      
+      try {
+        const res = await fetch('/api/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          showAlert('البوت اشتغل!', 'success');
+        } else {
+          showAlert(data.error, 'error');
+          startBtn.disabled = false;
+        }
+      } catch (err) {
+        showAlert('خطأ في الاتصال', 'error');
+        startBtn.disabled = false;
+      }
+      
+      startBtn.textContent = '▶️ تشغيل';
+    }
+    
+    async function stopBot() {
+      stopBtn.disabled = true;
+      stopBtn.textContent = '⏳ جاري الإيقاف...';
+      
+      try {
+        const res = await fetch('/api/stop', { method: 'POST' });
+        const data = await res.json();
+        
+        if (data.success) {
+          showAlert('البوت توقف', 'success');
+        } else {
+          showAlert(data.error, 'error');
+        }
+      } catch (err) {
+        showAlert('خطأ في الاتصال', 'error');
+      }
+      
+      stopBtn.textContent = '⏹️ إيقاف';
+    }
+    
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        
+        if (data.status === 'online') {
+          statsDiv.innerHTML = `
+            <span>🌐 ${data.guilds} سيرفر</span>
+            <span>👥 ${data.users} مستخدم</span>
+            <span>📡 ${Math.round(data.ping)}ms</span>
+          `;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    
+    // Load initial status
+    fetch('/api/status')
+      .then(r => r.json())
+      .then(data => updateStatus(data.status));
+    
+    // Refresh stats every 5 seconds if online
+    setInterval(() => {
+      if (statusDot.classList.contains('online')) {
+        loadStats();
+      }
+    }, 5000);
+  </script>
+</body>
+</html>
