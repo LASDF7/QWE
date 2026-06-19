@@ -127,9 +127,8 @@ function setupCommands() {
     description: 'يشغل أغنية من Spotify, SoundCloud, YouTube',
     async execute(message, args) {
       const query = args.join(' ');
-      if (!query) return message.reply('❌ اكتب اسم الأغنية أو الرابط!\n\n**أمثلة:**\n`!play Drake God's Plan`\n`!play https://open.spotify.com/track/...`\n`!play https://soundcloud.com/...`');
-
-      const voiceChannel = message.member.voice.channel;
+            if (!query) return message.reply("❌ اكتب اسم الأغنية أو الرابط!\n\n**أمثلة:**\n`!play Drake God's Plan`\n`!play https://open.spotify.com/track/...`\n`!play https://soundcloud.com/...`");
+      
       if (!voiceChannel) return message.reply('❌ ادخل روم صوتي الأول!');
 
       const permissions = voiceChannel.permissionsFor(message.client.user);
