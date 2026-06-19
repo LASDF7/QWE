@@ -127,8 +127,9 @@ function setupCommands() {
     description: 'يشغل أغنية من Spotify, SoundCloud, YouTube',
     async execute(message, args) {
       const query = args.join(' ');
-            if (!query) return message.reply("❌ اكتب اسم الأغنية أو الرابط!\n\n**أمثلة:**\n`!play Drake God's Plan`\n`!play https://open.spotify.com/track/...`\n`!play https://soundcloud.com/...`");
-      
+      if (!query) return message.reply("❌ اكتب اسم الأغنية أو الرابط!\n\n**أمثلة:**\n`!play Drake Gods Plan`\n`!play https://open.spotify.com/track/...`\n`!play https://soundcloud.com/...`");
+
+      const voiceChannel = message.member.voice.channel;
       if (!voiceChannel) return message.reply('❌ ادخل روم صوتي الأول!');
 
       const permissions = voiceChannel.permissionsFor(message.client.user);
@@ -350,7 +351,7 @@ function setupCommands() {
   // LEAVE
   bot.commands.set('leave', {
     name: 'leave',
-    aliases: ['طل', 'اخرج', 'dc', 'disconnect', 'stop'],
+    aliases: ['طل', 'اخرج', 'dc', 'disconnect'],
     description: 'يخرج من الروم الصوتي',
     execute(message) {
       const player = manager.get(message.guild.id);
@@ -452,7 +453,6 @@ function setupEvents() {
     const args = message.content.slice(1).trim().split(/ +/);
     let cmdName = args.shift().toLowerCase();
 
-    // Aliases map
     const aliases = {
       'شغل': 'play', 'p': 'play',
       'تخطي': 'skip', 's': 'skip', 'next': 'skip', 'التالي': 'skip',
@@ -500,7 +500,6 @@ app.post('/api/start', async (req, res) => {
   if (bot) return res.json({ success: false, error: 'البوت شغال!' });
   if (!token || token.length < 50) return res.json({ success: false, error: 'توكن غلط!' });
 
-  // Update config
   if (spotifyId) CONFIG.SPOTIFY_CLIENT_ID = spotifyId;
   if (spotifySecret) CONFIG.SPOTIFY_CLIENT_SECRET = spotifySecret;
   if (lavaHost) CONFIG.LAVA_HOST = lavaHost;
@@ -548,7 +547,6 @@ app.post('/api/stop', async (req, res) => {
 });
 
 app.get('/api/status', (req, res) => {
-  const player = bot ? manager?.get(Array.from(manager.players.keys())[0]) : null;
   res.json({
     status: botStatus,
     tag: bot?.user?.tag || null,
