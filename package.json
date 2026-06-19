@@ -1,15 +1,17 @@
 {
-  "name": "public",
+  "name": "music-bot",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "music-server.js",
   "scripts": {
-    "start": "node server.js",
-    "build": "npm install"
+    "start": "node music-server.js"
   },
   "dependencies": {
     "discord.js": "^14.14.1",
     "express": "^4.18.2",
     "ws": "^8.14.2",
-    "@discordjs/voice": "^0.16.1"
+    "@discordjs/voice": "^0.16.1",
+    "play-dl": "^1.9.7",
+    "libsodium-wrappers": "^0.7.13",
+    "opusscript": "^0.0.8"
   }
 }
