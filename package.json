@@ -1,16 +1,15 @@
 {
   "name": "music-bot",
   "version": "1.0.0",
-  "main": "music-server.js",
-  "scripts": {
-    "start": "node music-server.js"
-  },
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
   "dependencies": {
     "discord.js": "^14.14.1",
     "express": "^4.18.2",
     "ws": "^8.14.2",
     "@discordjs/voice": "^0.16.1",
-    "play-dl": "^1.9.7",
+    "erela.js": "^2.4.0",
+    "erela.js-spotify": "^1.2.0",
     "libsodium-wrappers": "^0.7.13",
     "opusscript": "^0.0.8"
   }
